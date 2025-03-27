@@ -4,6 +4,7 @@ import { ValidationMiddleware } from "../middleware/validation.middleware.js";
 import { loginSchema, registerSchema } from "../schemas/customer.schema.js";
 
 const customerRouter = Router()
+
 customerRouter
     .get("/:id", customerController.getProfile)
     .post("/register", ValidationMiddleware(registerSchema), customerController.register)

@@ -11,3 +11,4 @@ export const loginSchema = Joi.object({
     password: Joi.string().required(),
     role: Joi.string().valid('user', 'admin')
 }).required();
+  
