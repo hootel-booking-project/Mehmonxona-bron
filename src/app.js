@@ -13,4 +13,16 @@ app.all("/*", (req, res) => {
   });
 });
 
+app.use((err, req, res, next) => {
+  if(err.isException){
+    return res.status(err.status).send({
+      message: err.message
+    })
+  }
+  res.status(500).send({
+    message: err.message,
+    text:'Internal Server Error'
+  })
+})
+
 export default app;
