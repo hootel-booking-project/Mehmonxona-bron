@@ -1,16 +1,22 @@
+import jwtConfig from "../config/jwt.config.js";
 import { compare, hash } from "bcrypt";
+import jwt from "jsonwebtoken";
 import customerModel from "../models/customer.model.js";
+
+const generateTokens = (id) => {
+  const accessToken = jwt.sign({ id }, jwtConfig.ACCESS_TOKEN, { expiresIn: jwtConfig.ACCESS_TOKEN_EXPIRE });
+  const refreshToken = jwt.sign({ id }, jwtConfig.REFRESH_TOKEN, { expiresIn: jwtConfig.REFRESH_TOKEN_EXPIRE });
+  return { accessToken, refreshToken };
+};
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 
-  const foundedUser = await customerModel.findOne({
-    $or: [{ email }],
-  });
+  const foundedUser = await customerModel.findOne({ email });
 
   if (foundedUser) {
     return res.status(409).send({
-      message: "User already exists, try another email or phone number",
+      message: "User already exists, try another email",
     });
   }
 
@@ -22,9 +28,12 @@ const register = async (req, res) => {
     password: passwordHash,
   });
 
+  const tokens = generateTokens(customer._id);
+
   res.status(201).send({
     message: "success",
     data: customer,
+    tokens,
   });
 };
 
@@ -34,34 +43,47 @@ const login = async (req, res) => {
   const user = await customerModel.findOne({ email });
 
   if (!user) {
-    return res.status(404).send({
-      message: "User not found",
-    });
+    return res.status(404).send({ message: "User not found" });
   }
 
   const isMatch = await compare(password, user.password);
 
   if (!isMatch) {
-    return res.status(401).send({
-      message: "Invalid password",
-    });
+    return res.status(401).send({ message: "Invalid password" });
   }
 
-  res.send({
-    message: "success",
-    data: user,
+  const tokens = generateTokens(user._id);
+
+  res.send({ message: "success", data: user, tokens });
+};
+
+const refreshToken = (req, res) => {
+  const { token } = req.body;
+
+  if (!token) return res.status(401).send({ message: "Unauthorized" });
+
+  jwt.verify(token, jwtConfig.REFRESH_TOKEN, (err, decoded) => {
+    if (err) return res.status(403).send({ message: "Invalid refresh token" });
+    const newTokens = generateTokens(decoded.id);
+    res.send({ message: "success", tokens: newTokens });
+  });
+};
+
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).send({ message: "Unauthorized" });
+
+  jwt.verify(token, jwtConfig.ACCESS_TOKEN, (err, decoded) => {
+    if (err) return res.status(403).send({ message: "Invalid token" });
+    req.userId = decoded.id;
+    next();
   });
 };
 
 const getProfile = async (req, res) => {
   try {
-    const { id } = req.params
-    
-    const user = await customerModel.findById(id)
-    
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
+    const user = await customerModel.findById(req.userId);
+    if (!user) return res.status(404).send({ message: "User not found" });
     res.send({ message: "success", data: user });
   } catch (error) {
     res.status(500).send({ message: "Server error" });
@@ -70,15 +92,10 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { id } = req.params
-
     const { name, email, password } = req.body;
+    const user = await customerModel.findById(req.userId);
 
-    const user = await customerModel.findById(id);
-
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
+    if (!user) return res.status(404).send({ message: "User not found" });
 
     if (name) user.name = name;
     if (email) user.email = email;
@@ -92,4 +109,4 @@ const updateProfile = async (req, res) => {
   }
 };
 
-export default { register, login, getProfile, updateProfile };
+export default { register, login, refreshToken, getProfile, updateProfile, verifyToken };
