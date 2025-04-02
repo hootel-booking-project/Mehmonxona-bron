@@ -1,5 +1,7 @@
 import express from "express"
 import router from "./routes/index.js";
+import { BaseException } from "./exception/base.exception.js";
+import { ErrorHandlerMiddleware } from "./middleware/errr-handles.middleware.js";
 
 const app = express()
 
@@ -8,21 +10,14 @@ app.use(express.json())
 app.use("/api/hotel", router)
 
 app.all("/*", (req, res) => {
-  res.status(404).send({
-    message: `Given ${req.url} with method: ${req.method} not found`,
-  });
+  try {
+    throw new BaseException(
+      `Given ${req.url} with method: ${req.method} not found`,404)
+  } catch (error) {
+    next(error)
+  }
 });
 
-app.use((err, req, res, next) => {
-  if(err.isException){
-    return res.status(err.status).send({
-      message: err.message
-    })
-  }
-  res.status(500).send({
-    message: err.message,
-    text:'Internal Server Error'
-  })
-})
+app.use(ErrorHandlerMiddleware)
 
 export default app;
