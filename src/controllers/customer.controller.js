@@ -1,13 +1,8 @@
 import jwtConfig from "../config/jwt.config.js";
-import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken";
 import customerModel from "../models/customer.model.js";
-
-const generateTokens = (id) => {
-  const accessToken = jwt.sign({ id }, jwtConfig.ACCESS_TOKEN, { expiresIn: jwtConfig.ACCESS_TOKEN_EXPIRE });
-  const refreshToken = jwt.sign({ id }, jwtConfig.REFRESH_TOKEN, { expiresIn: jwtConfig.REFRESH_TOKEN_EXPIRE });
-  return { accessToken, refreshToken };
-};
+import { comparePassword, hashPassword } from "../utils/bcrypt-hash.js";
+import { generateTokens } from "../utils/tokens.js";
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -20,7 +15,7 @@ const register = async (req, res) => {
     });
   }
 
-  const passwordHash = await hash(password, 10);
+  const passwordHash = await hashPassword(password)
 
   const customer = await customerModel.create({
     name,
@@ -28,8 +23,8 @@ const register = async (req, res) => {
     password: passwordHash,
   });
 
-  const tokens = generateTokens(customer._id);
-
+  const tokens = await generateTokens(customer._id);
+ 
   res.status(201).send({
     message: "success",
     data: customer,
@@ -46,13 +41,13 @@ const login = async (req, res) => {
     return res.status(404).send({ message: "User not found" });
   }
 
-  const isMatch = await compare(password, user.password);
+  const isMatch = await comparePassword(password, user.password)
 
   if (!isMatch) {
     return res.status(401).send({ message: "Invalid password" });
   }
 
-  const tokens = generateTokens(user._id);
+  const tokens = await generateTokens(user._id);
 
   res.send({ message: "success", data: user, tokens });
 };
@@ -82,7 +77,8 @@ const verifyToken = (req, res, next) => {
 
 const getProfile = async (req, res) => {
   try {
-    const user = await customerModel.findById(req.userId);
+    const { id } = req.params
+    const user = await customerModel.findById(id);
     if (!user) return res.status(404).send({ message: "User not found" });
     res.send({ message: "success", data: user });
   } catch (error) {
@@ -92,16 +88,13 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
+    const { id } = req.params
+
     const { name, email, password } = req.body;
-    const user = await customerModel.findById(req.userId);
+    const hashedPassword = await hash(password, 10)
+    const user = await customerModel.findByIdAndUpdate(id, { name, email, hashedPassword})
 
     if (!user) return res.status(404).send({ message: "User not found" });
-
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (password) user.password = await hash(password, 10);
-
-    await user.save();
 
     res.send({ message: "Profile updated successfully", data: user });
   } catch (error) {

@@ -5,7 +5,7 @@ const app = express()
 
 app.use(express.json())
 
-app.use("/", router)
+app.use("/api/hotel", router)
 
 app.all("/*", (req, res) => {
   res.status(404).send({
