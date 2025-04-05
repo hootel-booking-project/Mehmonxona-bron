@@ -10,14 +10,14 @@ const roomRouter = Router();
 roomRouter
   .get("/",
     Protected(false),
-    Roles(ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN),
+    Roles(ROLES.ALL),
     roomController.getAllRooms
     )
 
   .post(
     "/",
     Protected(true),
-    Roles(ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN),
+    Roles(ROLES.ALL),
     ValidationMiddleware(roomSchema),
     roomController.createRoom
     )
@@ -25,14 +25,14 @@ roomRouter
   .get(
     "/:id",
     Protected(false),
-    Roles(ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN),
+    Roles(ROLES.ALL),
     roomController.getRoomById
     )
 
   .put(
     "/:id",
     Protected(true),
-    Roles(ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN),
+    Roles(ROLES.ALL),
     ValidationMiddleware(roomSchema),
     roomController.updateRoom
     )
@@ -40,7 +40,7 @@ roomRouter
   .delete(
     "/:id",
     Protected(true),
-    Roles(ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN),
+    Roles(ROLES.ALL),
     roomController.deleteRoom
     )
 

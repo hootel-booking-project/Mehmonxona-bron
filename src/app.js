@@ -9,7 +9,7 @@ app.use(express.json())
 
 app.use("/api/hotel", router)
 
-app.all("/*", (req, res) => {
+app.all("/*", (req, res, next) => {
   try {
     throw new BaseException(
       `Given ${req.url} with method: ${req.method} not found`,404)

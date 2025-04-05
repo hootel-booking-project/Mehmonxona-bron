@@ -28,7 +28,7 @@ bookingRouter
   .post(
     "/",
     Protected(true),
-    Roles(ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN),
+    Roles(ROLES.ALL),
     ValidationMiddleware(createBookingSchema),
     bookingController.bookingRoom
     )
@@ -37,7 +37,7 @@ bookingRouter
     "/",
     Protected(true),
     ValidationMiddleware(updateBookingSchema),
-    Roles(ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN),
+    Roles(ROLES.ALL),
     bookingController.updateBooking
     )
 

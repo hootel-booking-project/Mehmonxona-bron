@@ -15,6 +15,12 @@ customerRouter
     Protected(true),
     customerController.getProfile
     )
+    .get(
+      "/",
+      Roles(ROLES.ALL),
+      Protected(true),
+      customerController.getAllUsers
+    )
 
   .post(
     "/register",
@@ -38,5 +44,6 @@ customerRouter
     Roles(ROLES.ALL),
     customerController.updateProfile
   )
+  
 
 export default customerRouter;
