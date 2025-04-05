@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ROLES } from "../constants/role.constants.js";
 
 const customerSchema = new mongoose.Schema({
     name: {
@@ -16,8 +17,8 @@ const customerSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["user", "admin"],
-        default: "user"
+        enum: [ROLES.VIEWER, ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN],
+        default: ROLES.VIEWER
     },
     bookedRooms: [{
       type: mongoose.SchemaTypes.ObjectId,

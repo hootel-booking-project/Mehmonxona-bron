@@ -24,7 +24,8 @@ const bookingRoom = async (req, res) => {
         message: "Succes",
         data: booking
     })
-}
+};
+
 
 const getBookingById = async (req, res) => {
     const { id } = req.params;
@@ -36,7 +37,8 @@ const getBookingById = async (req, res) => {
     }
 
     res.send({ message: "Success", data: booking });
-  }
+};
+
 
 const getUserBookings = async (req, res) => {
     const { userId } = req.params;
@@ -66,6 +68,7 @@ const updateBooking = async (req, res) => {
  
 };
 
+
 const deleteBooking = async (req, res) => {
     const { id } = req.params;
 
@@ -77,7 +80,6 @@ const deleteBooking = async (req, res) => {
 
     res.send({ message: "Booking deleted successfully" });
 };
-
 
 
 export default { bookingRoom, getBookingById, getUserBookings, updateBooking, deleteBooking }
