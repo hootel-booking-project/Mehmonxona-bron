@@ -3,7 +3,7 @@ import Joi from "joi";
 export const createBookingSchema = Joi.object({
   userId: Joi.string().required(),
 
-  roomId: Joi.string().required(),
+  roomId: Joi.number().required(),
 
   dayIn: Joi.date().iso().min("now").required(),
 

@@ -19,7 +19,7 @@ const roomSchema = new mongoose.Schema(
       min: 0,
     },
     available: {
-      type: Boolean,
+      type: Boolean, 
       default: true,
     },
   },

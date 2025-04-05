@@ -14,6 +14,7 @@ const getAllRooms = async (req, res) => {
 
     res.status(200).send({
       success: true,
+      count: rooms.length,
       message: "Xonalar muvaffaqiyatli yuklandi",
       data: rooms
     });

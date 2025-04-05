@@ -39,7 +39,7 @@ const register = async (req, res, next) => {
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
  try {
   const { email, password } = req.body;
 
@@ -63,11 +63,11 @@ const login = async (req, res) => {
     tokens
   });
  } catch (error) {
-  next(error)
+    next(error)
  }
 };
 
-const refreshToken = (req, res) => {
+const refreshToken = (req, res, next) => {
   try {
     const { token } = req.body;
 
@@ -94,19 +94,27 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-const getProfile = async (req, res) => {
+const getProfile = async (req, res, next) => {
    try {
     const { id } = req.params
-    const user = await customerModel.findById(id);
+    const user = await customerModel.findById(id)
+    .populate({
+      path: 'bookedRooms',
+      model: 'Booking' 
+    });
     
     if (!user) return next(new BaseException('user not found',404)) 
-    res.send({ message: "success", data: user });
+    res.send({ 
+    message: "success", 
+
+    data: user 
+    });
    } catch (error) {
-    next(error)
+      next(error)
    }
 };
 
-const updateProfile = async (req, res) => {
+const updateProfile = async (req, res, next) => {
   try {
       const { id } = req.params
 
@@ -120,7 +128,7 @@ const updateProfile = async (req, res) => {
     res.send({ message: "Profile updated successfully", data: user });
  
   } catch (error) {
-    next(BaseException('Internal Server Error', 500))
+      next(BaseException('Internal Server Error', 500))
   }
 }
 

@@ -7,7 +7,7 @@ const bookingSchema = new mongoose.Schema({
         required: true
     },
     roomId: {
-        type: mongoose.SchemaTypes.ObjectId,
+        type: Number,
         ref: "Room",
         required: true
     },
