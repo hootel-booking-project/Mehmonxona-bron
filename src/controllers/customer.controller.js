@@ -98,10 +98,7 @@ const getProfile = async (req, res, next) => {
    try {
     const { id } = req.params
     const user = await customerModel.findById(id)
-    .populate({
-      path: 'bookedRooms',
-      model: 'Booking' 
-    });
+    .populate("booking");
     
     if (!user) return next(new BaseException('user not found',404)) 
     res.send({ 

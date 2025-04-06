@@ -29,7 +29,7 @@ const bookingRoom = async (req, res) => {
 const getBookingById = async (req, res) => {
     const { id } = req.params;
 
-    const booking = await bookingModel.findById(id).populate("userId roomId");
+    const booking = await bookingModel.findById(id).populate("customer");
 
     if (!booking) {
       return res.status(404).send({ message: "Booking not found" });

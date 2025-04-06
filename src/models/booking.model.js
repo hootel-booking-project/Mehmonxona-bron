@@ -18,6 +18,10 @@ const bookingSchema = new mongoose.Schema({
     dayOut: {
         type: Date,
         required: true
+    },
+    customer : {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Customers"
     }
 }, {
     timestamps: true,

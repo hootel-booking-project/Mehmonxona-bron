@@ -19,7 +19,7 @@ const customerSchema = new mongoose.Schema({
         enum: ["user", "admin"],
         default: "user"
     },
-    bookedRooms: [{
+    booking: [{
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Booking"
     }]
@@ -30,4 +30,4 @@ const customerSchema = new mongoose.Schema({
     versionKey: false
 }
 )
-export default mongoose.model("Customer", customerSchema)
+export default mongoose.model("Customers", customerSchema)
