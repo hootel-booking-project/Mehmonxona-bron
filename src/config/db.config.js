@@ -10,6 +10,8 @@ const connectToMongoDb = async () => {
         
     } catch (error) {
         console.log(`MongoDb ga ulanishda xatolik❌`);
+        console.log(error);
+        
         process.exit(1)
     }
 }

@@ -4,6 +4,7 @@ import customerModel from "../models/customer.model.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt-hash.js";
 import { generateTokens } from "../utils/tokens.js";
 import { BaseException } from "../exception/base.exception.js";
+import sendMail from "../utils/mail.utils.js";
 
 const register = async (req, res, next) => {
   try {
@@ -11,12 +12,8 @@ const register = async (req, res, next) => {
 
     const foundedUser = await customerModel.findOne({ email });
 
-    if (foundedUser) {
-      throw new BaseException(
-       "User already exists, try another email or password",
-        409
-      )
-
+    if (foundedUser){
+      throw new BaseException("User already exists, try another email or password",409)
     }
 
   const passwordHash = await hashPassword(password)
@@ -28,12 +25,19 @@ const register = async (req, res, next) => {
   });
 
   const tokens = await generateTokens(customer._id);
+
+  await sendMail({
+    to:email,
+    subject: 'Wellcome',
+    text:`Assalomu Alaykum ${name} Bizning MehmonXona saytimizdan muvaffaqiyatli royhatdan otdingiz malades 💥`,
+  })
  
   res.status(201).send({
     message: "success",
     data: customer,
-    tokens,
+    tokens, 
   });
+
   } catch (error) {
     next(error)
   }
@@ -57,6 +61,17 @@ const login = async (req, res, next) => {
 
   const tokens = await generateTokens(user._id);
 
+  res.cookie("accessToken", tokens.accessToken, {
+    maxAge: 60 * 1000,
+    httpOnly: true,
+  });
+
+  res.cookie("refreshToken", tokens.refreshToken, {
+    maxAge: 2 * 60 * 1000,
+    httpOnly: true,
+  });
+
+
   res.send({ 
     message: "success",
     data: user,
@@ -65,6 +80,24 @@ const login = async (req, res, next) => {
  } catch (error) {
     next(error)
  }
+};
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await userModel.find().populate({
+        path: "bookings",
+        populate: {
+          path: "roomId",
+        },
+      });
+
+    res.send({
+      message: "success",
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const refreshToken = (req, res, next) => {
@@ -129,4 +162,4 @@ const updateProfile = async (req, res, next) => {
   }
 }
 
-export default { register, login, refreshToken, getProfile, updateProfile, verifyToken };
+export default { register, login, getAllUsers, refreshToken, getProfile, updateProfile, verifyToken };

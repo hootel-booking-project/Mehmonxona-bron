@@ -44,13 +44,13 @@ const createRoom = async (req, res) => {
 
     res.status(201).send({
       success: true,
-      message: "Xona muvaffaqiyatli qo‘shildi",
+      message: "Xona muvaffaqiyatli qoshildi",
       data: newRoom
     });
   } catch (error) {
     res.status(500).send({
       success: false,
-      message: "Xona qo‘shishda xatolik",
+      message: "Xona qoshishda xatolik",
       error: error.message
     });
   }
@@ -115,12 +115,12 @@ const deleteRoom = async (req, res) => {
     }
     res.status(200).send({
       success: true,
-      message: "Xona muvaffaqiyatli o‘chirildi"
+      message: "Xona muvaffaqiyatli ochirildi"
     });
   } catch (error) {
     res.status(500).send({
       success: false,
-      message: "Xonani o‘chirishda xatolik",
+      message: "Xonani ochirishda xatolik",
       error: error.message
     });
   }
