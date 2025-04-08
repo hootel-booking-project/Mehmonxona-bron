@@ -13,7 +13,9 @@ const register = async (req, res, next) => {
     const foundedUser = await customerModel.findOne({ email });
 
     if (foundedUser){
-      throw new BaseException("User already exists, try another email or password",409)
+      res.render("register", {
+        error: "User already exists, try again!"
+      })
     }
 
   const passwordHash = await hashPassword(password)
@@ -31,13 +33,9 @@ const register = async (req, res, next) => {
     subject: 'Wellcome',
     text:`Assalomu Alaykum ${name} Bizning MehmonXona saytimizdan muvaffaqiyatli royhatdan otdingiz malades 💥`,
   })
- 
-  res.status(201).send({
-    message: "success",
-    data: customer,
-    tokens, 
-  });
 
+  return res.redirect("/users/login")
+ 
   } catch (error) {
     next(error)
   }
@@ -46,17 +44,22 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
  try {
   const { email, password } = req.body;
-
+  console.log(req.body);
+  
   const user = await customerModel.findOne({ email });
 
   if (!user) {
-    throw new BaseException("User not found", 404);
+    return res.render("/users/login", {
+      error: "User not found"
+    })
   }
 
   const isMatch = await comparePassword(password, user.password)
 
   if (!isMatch) {
-    throw new BaseException("Invalid password", 401);
+    return res.render("/users/login", {
+      error: "Invalid password"
+    })
   }
 
   const tokens = await generateTokens(user._id);
@@ -71,12 +74,10 @@ const login = async (req, res, next) => {
     httpOnly: true,
   });
 
+  res.cookie("user", JSON.stringify(user))
 
-  res.send({ 
-    message: "success",
-    data: user,
-    tokens
-  });
+  return res.redirect("/")
+
  } catch (error) {
     next(error)
  }

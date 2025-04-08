@@ -1,21 +1,25 @@
 import express from "express"
 import router from "./routes/index.js";
-import { BaseException } from "./exception/base.exception.js";
+import cookieParser from "cookie-parser"
 import { ErrorHandlerMiddleware } from "./middleware/errr-handles.middleware.js";
+import path from "node:path";
+import pageRouter from "./routes/page.route.js";
 
 const app = express()
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-app.use("/api/hotel", router)
+app.set("view engine", "ejs")
+app.set("views", path.join(process.cwd(), "src", "views"))
 
-app.all("/*", (req, res, next) => {
-  try {
-    throw new BaseException(
-      `Given ${req.url} with method: ${req.method} not found`,404)
-  } catch (error) {
-    next(error)
-  }
+app.use(cookieParser())
+
+app.use("/", pageRouter)
+app.use("/", router)
+
+app.all("/*", (_, res) => {
+    res.render("notfound")
 });
 
 app.use(ErrorHandlerMiddleware)
