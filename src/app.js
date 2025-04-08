@@ -15,6 +15,8 @@ app.set("views", path.join(process.cwd(), "src", "views"))
 
 app.use(cookieParser())
 
+
+
 app.use("/", pageRouter)
 app.use("/", router)
 

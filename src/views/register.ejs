@@ -4,20 +4,53 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign up</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+      crossorigin="anonymous"
+    />
   </head>
-  <body>
-    <h1>Register page</h1>
-    <h4 style="color: red"><%= error %></h4>
-    <form action="/customers/register" method="post">
-      <input type="text" placeholder="name" name="name" />
-      <br />
-      <input type="email" placeholder="email" name="email" />
-      <br />
-      <input type="text" placeholder="password" name="password" />
-      <br />
-      <a href="/customers/login">Already have account? Login...</a>
-      <br />
-      <button type="submit">Sign up</button>
-    </form>
+  <body class="bg-light">
+    <div class="container d-flex justify-content-center">
+      <div
+        class="form-elements bg-white mt-5 w-45 d-flex flex-column gap-3 align-items-center shadow p-5 rounded-4">
+        <h1>Register page</h1>
+        <h4 style="color: red"><%= error %></h4>
+
+        <form
+          class="w-75 d-flex flex-column gap-3 align-items-center"
+          action="/users/register"
+          method="post"
+        >
+          <input
+            type="text"
+            class="form-control"
+            placeholder="name"
+            name="name"
+          />
+          <input
+            class="form-control"
+            type="email"
+            placeholder="email"
+            name="email"
+          />
+          <input
+            class="form-control"
+            type="text"
+            placeholder="password"
+            name="password"
+          />
+          <a href="/customers/login">Already have account? Login...</a>
+          <button class="btn btn-info w-100" type="submit">Sign up</button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

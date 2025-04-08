@@ -27,8 +27,6 @@ const register = async (req, res, next) => {
       password: passwordHash,
     });
 
-    const tokens = await generateTokens(customer._id);
-
     await sendMail({
       to: email,
       subject: "Wellcome",
@@ -43,8 +41,6 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    ("done1");
-
     const { email, password } = req.body;
     req.body;
 
@@ -59,7 +55,6 @@ const login = async (req, res, next) => {
     if (!isMatch) {
       return res.render("login", { error: "Invalid password" });
     }
-    ("done");
 
     const tokens = await generateTokens(user._id);
 
@@ -110,7 +105,7 @@ const forgotPassword = async (req, res, next) => {
       `,
     });
 
-    res.redirect("/customers/reset-password", {
+    res.render("forgot-password", {
       message: "Emailingizga link yuborildi!",
       error: null,
     });
@@ -123,13 +118,12 @@ const resetPassword = async (req, res, next) => {
   try {
     const { password } = req.body;
     const { token } = req.query;
-    password, token;
 
     if (!token) {
       return res.redirect("/customers/login");
     }
 
-    const user = await userModel.findOne({ token });
+    const user = await customerModel.findOne({ token });
 
     if (!user) {
       return res.redirect("/customers/forgot-password");

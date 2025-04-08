@@ -9,8 +9,8 @@ export const Protected = (isProtected) => {
       return next();
     }
 
-    const accessToken = req.cookies?.accessToken;
-    const refreshToken = req.cookies?.refreshToken;
+    const accessToken = req.cookies.accessToken;
+    const refreshToken = req.cookies.refreshToken;
 
     if (!accessToken && !refreshToken) {
       return res.redirect("/customers/login");
