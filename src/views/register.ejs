@@ -6,16 +6,17 @@
     <title>Sign up</title>
   </head>
   <body>
-    <h1>Login page</h1>
+    <h1>Register page</h1>
+    <h4 style="color: red"><%= error %></h4>
     <form action="/customers/register" method="post">
       <input type="text" placeholder="name" name="name" />
-      <br /><br />
-      <input type="email" placeholder="email" name="password" />
       <br />
+      <input type="email" placeholder="email" name="email" />
       <br />
-      <a href="/customers/login">Already have an account ?</a>
-      <br /><br />
-      <input type="password" placeholder="password" name="password" />
+      <input type="text" placeholder="password" name="password" />
+      <br />
+      <a href="/customers/login">Already have account? Login...</a>
+      <br />
       <button type="submit">Sign up</button>
     </form>
   </body>

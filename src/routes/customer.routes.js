@@ -9,41 +9,42 @@ import { Protected } from "../middleware/protected.middleware.js";
 const customerRouter = Router();
 
 customerRouter
-  .get(
-    "/:id",
-    Roles(ROLES.ALL),
-    Protected(true),
-    customerController.getProfile
-    )
-    .get(
-      "/",
-      Roles(ROLES.ALL),
-      Protected(true),
-      customerController.getAllUsers
-    )
+.get(
+  "/",
+  Roles(ROLES.ALL),
+  Protected(true),
+  customerController.getAllUsers
+)
 
-  .post(
-    "/register",
-    Protected(false),
-    Roles(ROLES.ALL),
-    ValidationMiddleware(registerSchema),
-    customerController.register
-  )
+.post(
+  "/register",
+  Protected(false),
+  Roles(ROLES.ALL),
+  ValidationMiddleware(registerSchema),
+  customerController.register
+)
 
-  .post(
-    "/login",
-    Protected(false),
-    Roles(ROLES.ALL),
-    ValidationMiddleware(loginSchema),
-    customerController.login
-  )
+.post(
+  "/login",
+  Protected(false),
+  Roles(ROLES.ALL),
+  ValidationMiddleware(loginSchema),
+  customerController.login
+)
 
-  .put(
-    "/:id",
-    Protected(false),
-    Roles(ROLES.ALL),
-    customerController.updateProfile
-  )
+.get(
+  "/:id",
+  Roles(ROLES.ALL),
+  Protected(true),
+  customerController.getProfile
+)
+
+.put(
+  "/:id",
+  Protected(false),
+  Roles(ROLES.ALL),
+  customerController.updateProfile
+)
   
 
 export default customerRouter;

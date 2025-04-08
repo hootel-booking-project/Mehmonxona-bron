@@ -1,5 +1,6 @@
 import jwtConfig from "../config/jwt.config.js";
 import jwt from "jsonwebtoken";
+import crypto from "node:crypto";
 import customerModel from "../models/customer.model.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt-hash.js";
 import { generateTokens } from "../utils/tokens.js";
@@ -12,84 +13,152 @@ const register = async (req, res, next) => {
 
     const foundedUser = await customerModel.findOne({ email });
 
-    if (foundedUser){
+    if (foundedUser) {
       res.render("register", {
-        error: "User already exists, try again!"
-      })
+        error: "User already exists, try again!",
+      });
     }
 
-  const passwordHash = await hashPassword(password)
+    const passwordHash = await hashPassword(password);
 
-  const customer = await customerModel.create({
-    name,
-    email,
-    password: passwordHash,
-  });
+    const customer = await customerModel.create({
+      name,
+      email,
+      password: passwordHash,
+    });
 
-  const tokens = await generateTokens(customer._id);
+    const tokens = await generateTokens(customer._id);
 
-  await sendMail({
-    to:email,
-    subject: 'Wellcome',
-    text:`Assalomu Alaykum ${name} Bizning MehmonXona saytimizdan muvaffaqiyatli royhatdan otdingiz malades 💥`,
-  })
+    await sendMail({
+      to: email,
+      subject: "Wellcome",
+      text: `Assalomu Alaykum ${name} Bizning MehmonXona saytimizdan muvaffaqiyatli royhatdan otdingiz malades 💥`,
+    });
 
-  return res.redirect("/users/login")
- 
+    return res.redirect("/customers/login");
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
 const login = async (req, res, next) => {
- try {
-  const { email, password } = req.body;
-  console.log(req.body);
-  
-  const user = await customerModel.findOne({ email });
+  try {
+    ("done1");
 
-  if (!user) {
-    return res.render("/users/login", {
-      error: "User not found"
-    })
+    const { email, password } = req.body;
+    req.body;
+
+    const user = await customerModel.findOne({ email });
+
+    if (!user) {
+      return res.render("login", { error: "User not found" });
+    }
+
+    const isMatch = await comparePassword(password, user.password);
+
+    if (!isMatch) {
+      return res.render("login", { error: "Invalid password" });
+    }
+    ("done");
+
+    const tokens = await generateTokens(user._id);
+
+    res.cookie("accessToken", tokens.accessToken, {
+      maxAge: 60 * 1000,
+      httpOnly: true,
+    });
+
+    res.cookie("refreshToken", tokens.refreshToken, {
+      maxAge: 2 * 60 * 1000,
+      httpOnly: true,
+    });
+
+    res.cookie("user", JSON.stringify(user));
+
+    return res.redirect("/");
+  } catch (error) {
+    next(error);
   }
-
-  const isMatch = await comparePassword(password, user.password)
-
-  if (!isMatch) {
-    return res.render("/users/login", {
-      error: "Invalid password"
-    })
-  }
-
-  const tokens = await generateTokens(user._id);
-
-  res.cookie("accessToken", tokens.accessToken, {
-    maxAge: 60 * 1000,
-    httpOnly: true,
-  });
-
-  res.cookie("refreshToken", tokens.refreshToken, {
-    maxAge: 2 * 60 * 1000,
-    httpOnly: true,
-  });
-
-  res.cookie("user", JSON.stringify(user))
-
-  return res.redirect("/")
-
- } catch (error) {
-    next(error)
- }
 };
+
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const user = await customerModel.findOne({ email });
+
+    if (!user) {
+      return res.render("forgot-password", {
+        error: "User not found",
+        message: null,
+      });
+    }
+
+    const server_base_url = "http://localhost:3000";
+
+    const token = crypto.randomBytes(50);
+    user.token = token.toString("hex");
+
+    await user.save();
+
+    await sendMail({
+      to: email,
+      subject: "Reset password",
+      html: `
+      <h2>quydagi link orqali passwordingizni yangilang</h2>
+      <a href="${server_base_url}/customers/reset-password?token=${user.token}">Link</a>
+      `,
+    });
+
+    res.redirect("/customers/reset-password", {
+      message: "Emailingizga link yuborildi!",
+      error: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    const { token } = req.query;
+    password, token;
+
+    if (!token) {
+      return res.redirect("/customers/login");
+    }
+
+    const user = await userModel.findOne({ token });
+
+    if (!user) {
+      return res.redirect("/customers/forgot-password");
+    }
+
+    const passwordHash = await hash(password, 10);
+
+    user.password = passwordHash;
+
+    await user.save();
+
+    res.render("reset-password", {
+      message: "Password yangilandi",
+      error: null,
+      token: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await userModel.find().populate({
-        path: "bookings",
-        populate: {
-          path: "roomId",
-        },
-      });
+      path: "bookings",
+      populate: {
+        path: "roomId",
+      },
+    });
 
     res.send({
       message: "success",
@@ -106,14 +175,15 @@ const refreshToken = (req, res, next) => {
     const { token } = req.body;
 
     if (!token) return res.status(401).send({ message: "Unauthorized" });
-  
+
     jwt.verify(token, jwtConfig.REFRESH_TOKEN, (err, decoded) => {
-      if (err) return res.status(403).send({ message: "Invalid refresh token" });
+      if (err)
+        return res.status(403).send({ message: "Invalid refresh token" });
       const newTokens = generateTokens(decoded.id);
       res.send({ message: "success", tokens: newTokens });
     });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
@@ -122,45 +192,60 @@ const verifyToken = (req, res, next) => {
   if (!token) return res.status(401).send({ message: "Unauthorized" });
 
   jwt.verify(token, jwtConfig.ACCESS_TOKEN, (err, decoded) => {
-    if (err) return next(BaseException('Invalid Token',403))
-    
+    if (err) return next(BaseException("Invalid Token", 403));
+
     req.userId = decoded.id;
   });
 };
 
 const getProfile = async (req, res, next) => {
-   try {
-    const { id } = req.params
-    const user = await customerModel.findById(id)
-    .populate("booking");
-    
-    if (!user) return next(new BaseException('user not found',404)) 
-    res.send({ 
-    message: "success", 
+  try {
+    console.log("done123");
 
-    data: user 
+    const { id } = req.params;
+    console.log("bu id", id);
+
+    const user = await customerModel.findById(id).populate("booking");
+
+    if (!user) return next(new BaseException("user not found", 404));
+    res.send({
+      message: "success",
+
+      data: user,
     });
-   } catch (error) {
-      next(error)
-   }
+  } catch (error) {
+    next(error);
+  }
 };
 
 const updateProfile = async (req, res, next) => {
   try {
-      const { id } = req.params
+    const { id } = req.params;
 
     const { name, email, password } = req.body;
-    const hashedPassword = await hash(password, 10)
-    const user = await customerModel.findByIdAndUpdate(id, { name, email, hashedPassword})
+    const hashedPassword = await hash(password, 10);
+    const user = await customerModel.findByIdAndUpdate(id, {
+      name,
+      email,
+      hashedPassword,
+    });
 
-    if (!user) return next(BaseException('User Not Found',400))
-    
+    if (!user) return next(BaseException("User Not Found", 400));
 
     res.send({ message: "Profile updated successfully", data: user });
- 
   } catch (error) {
-      next(BaseException('Internal Server Error', 500))
+    next(BaseException("Internal Server Error", 500));
   }
-}
+};
 
-export default { register, login, getAllUsers, refreshToken, getProfile, updateProfile, verifyToken };
+export default {
+  register,
+  login,
+  getAllUsers,
+  refreshToken,
+  getProfile,
+  updateProfile,
+  verifyToken,
+  forgotPassword,
+  resetPassword,
+};

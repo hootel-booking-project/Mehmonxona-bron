@@ -7,13 +7,16 @@
   </head>
   <body>
     <h1>Login page</h1>
+    <h4 style="color: red"><%= error %></h4>
     <form action="/customers/login" method="post">
-      <input type="email" placeholder="email" name="password" />
+      <input type="email" placeholder="email" name="email" />
       <br />
+      <input type="text" placeholder="password" name="password" />
       <br />
-      <a href="/customers/register">Don't  have an account ?</a>
-      <br><br>
-      <input type="password" placeholder="password" name="password" />
+      <a href="/customers/register">Don't have account? Register...</a>
+      <br />
+      <a href="/customers/forgot-password">Forgot password</a>
+      <br />
       <button type="submit">Sign in</button>
     </form>
   </body>
