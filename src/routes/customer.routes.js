@@ -17,6 +17,20 @@ customerRouter
 )
 
 .post(
+  "/forgot-password",
+  Protected(false),
+  Roles(ROLES.ALL),
+  customerController.forgotPassword
+)
+
+.post(
+  "/reset-password",
+  Protected(false),
+  Roles(ROLES.ALL),
+  customerController.resetPassword
+)
+
+.post(
   "/register",
   Protected(false),
   Roles(ROLES.ALL),

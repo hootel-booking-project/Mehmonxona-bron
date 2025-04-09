@@ -89,6 +89,10 @@ export const forgotPassword = async (req, res, next) => {
       });
     }
 
+<<<<<<< HEAD
+=======
+    const server_base_url = "http://localhost:4000";
+>>>>>>> 7a6b38a0bb4f2f4da3c66581a05d00ccb675c8ad
 
     const server_base_url = "http://localhost:3000";
     const token = crypto.randomBytes(50);
@@ -105,7 +109,7 @@ export const forgotPassword = async (req, res, next) => {
       `,
     });
 
-    res.render("forgot-password", {
+    res.redirect("/customers/reset-password", {
       message: "Emailingizga link yuborildi!",
       error: null,
     });
@@ -121,7 +125,7 @@ const resetPassword = async (req, res, next) => {
 
     // Agar token bo'lmasa, foydalanuvchini login sahifasiga yo'naltirish
     if (!token) {
-      return res.redirect("/customers/login");
+      return res.render("login");
     }
 
     // Token bo'yicha foydalanuvchini topish
@@ -129,7 +133,7 @@ const resetPassword = async (req, res, next) => {
 
     // Agar foydalanuvchi topilmasa, foydalanuvchini forgot-password sahifasiga yo'naltirish
     if (!user) {
-      return res.redirect("/customers/forgot-password");
+      return res.render("forgot-password");
     }
 
     // Yangi parolni hash qilish
@@ -142,8 +146,16 @@ const resetPassword = async (req, res, next) => {
     // Foydalanuvchini saqlash
     await user.save();
 
+<<<<<<< HEAD
     // Parol yangilanganidan keyin foydalanuvchini login sahifasiga yo'naltirish
     res.redirect("/customers/login"); // Login sahifasiga yo'naltirish
+=======
+    res.redirect("/customers/login", {
+      message: "Password yangilandi",
+      error: null,
+      token: null,
+    });
+>>>>>>> 7a6b38a0bb4f2f4da3c66581a05d00ccb675c8ad
   } catch (error) {
     next(error);
   }
