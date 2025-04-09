@@ -4,6 +4,19 @@ import connectToMongoDb from "./config/db.config.js";
 
 await connectToMongoDb();
 
-app.listen(PORT, () => console.log(`Server is running on port: ${PORT}✅`
+let server = app.listen(PORT, () => console.log(`Server is running on port: ${PORT}✅`
 
 ));
+
+process.on("unhandledRejection", (reason, promise) => {
+    server.closeAllConnections();
+    server.close(() => {
+      process.exit(1);
+    });
+  });
+
+process.on("uncaughtException", (err) => {
+    console.log(err);
+    
+  process.exit(1);
+});

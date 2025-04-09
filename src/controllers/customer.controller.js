@@ -29,7 +29,7 @@ const register = async (req, res, next) => {
 
     await sendMail({
       to: email,
-      subject: "Wellcome",
+      subject: "Welcome",
       text: `Assalomu Alaykum ${name} Bizning MehmonXona saytimizdan muvaffaqiyatli royhatdan otdingiz malades 💥`,
     });
 
@@ -42,12 +42,12 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    req.body;
 
     const user = await customerModel.findOne({ email });
 
     if (!user) {
-      return res.render("login", { error: "User not found" });
+      res.render("login", { error: "User not found" });
+      return;
     }
 
     const isMatch = await comparePassword(password, user.password);
@@ -76,7 +76,7 @@ const login = async (req, res, next) => {
   }
 };
 
-const forgotPassword = async (req, res, next) => {
+export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
 
@@ -89,8 +89,8 @@ const forgotPassword = async (req, res, next) => {
       });
     }
 
-    const server_base_url = "http://localhost:3000";
 
+    const server_base_url = "http://localhost:3000";
     const token = crypto.randomBytes(50);
     user.token = token.toString("hex");
 
@@ -100,8 +100,8 @@ const forgotPassword = async (req, res, next) => {
       to: email,
       subject: "Reset password",
       html: `
-      <h2>quydagi link orqali passwordingizni yangilang</h2>
-      <a href="${server_base_url}/customers/reset-password?token=${user.token}">Link</a>
+        <h2>Quyidagi link orqali parolingizni yangilang</h2>
+        <a href="${server_base_url}/customers/reset-password?token=${user.token}">Link</a>
       `,
     });
 
@@ -116,30 +116,34 @@ const forgotPassword = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   try {
-    const { password } = req.body;
-    const { token } = req.query;
+    const { password } = req.body;  // Yangi parolni olish
+    const { token } = req.query;    // Tokenni olish
 
+    // Agar token bo'lmasa, foydalanuvchini login sahifasiga yo'naltirish
     if (!token) {
       return res.redirect("/customers/login");
     }
 
+    // Token bo'yicha foydalanuvchini topish
     const user = await customerModel.findOne({ token });
 
+    // Agar foydalanuvchi topilmasa, foydalanuvchini forgot-password sahifasiga yo'naltirish
     if (!user) {
       return res.redirect("/customers/forgot-password");
     }
 
-    const passwordHash = await hash(password, 10);
+    // Yangi parolni hash qilish
+    const passwordHash = await hashPassword(password);
 
+    // Foydalanuvchining parolini yangilash va tokenni tozalash
     user.password = passwordHash;
+    user.token = null; // Tokenni tozalash
 
+    // Foydalanuvchini saqlash
     await user.save();
 
-    res.render("reset-password", {
-      message: "Password yangilandi",
-      error: null,
-      token: null,
-    });
+    // Parol yangilanganidan keyin foydalanuvchini login sahifasiga yo'naltirish
+    res.redirect("/customers/login"); // Login sahifasiga yo'naltirish
   } catch (error) {
     next(error);
   }
@@ -194,17 +198,13 @@ const verifyToken = (req, res, next) => {
 
 const getProfile = async (req, res, next) => {
   try {
-    console.log("done123");
-
     const { id } = req.params;
-    console.log("bu id", id);
 
     const user = await customerModel.findById(id).populate("booking");
 
     if (!user) return next(new BaseException("user not found", 404));
     res.send({
       message: "success",
-
       data: user,
     });
   } catch (error) {
@@ -215,13 +215,14 @@ const getProfile = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const { id } = req.params;
-
     const { name, email, password } = req.body;
-    const hashedPassword = await hash(password, 10);
+
+    const hashedPassword = await hashPassword(password);
+
     const user = await customerModel.findByIdAndUpdate(id, {
       name,
       email,
-      hashedPassword,
+      password: hashedPassword,
     });
 
     if (!user) return next(BaseException("User Not Found", 400));
