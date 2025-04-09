@@ -89,7 +89,7 @@ const forgotPassword = async (req, res, next) => {
       });
     }
 
-    const server_base_url = "http://localhost:3000";
+    const server_base_url = "http://localhost:4000";
 
     const token = crypto.randomBytes(50);
     user.token = token.toString("hex");
@@ -105,7 +105,7 @@ const forgotPassword = async (req, res, next) => {
       `,
     });
 
-    res.render("forgot-password", {
+    res.redirect("/customers/reset-password", {
       message: "Emailingizga link yuborildi!",
       error: null,
     });
@@ -120,13 +120,13 @@ const resetPassword = async (req, res, next) => {
     const { token } = req.query;
 
     if (!token) {
-      return res.redirect("/customers/login");
+      return res.render("login");
     }
 
     const user = await customerModel.findOne({ token });
 
     if (!user) {
-      return res.redirect("/customers/forgot-password");
+      return res.render("forgot-password");
     }
 
     const passwordHash = await hash(password, 10);
@@ -135,7 +135,7 @@ const resetPassword = async (req, res, next) => {
 
     await user.save();
 
-    res.render("reset-password", {
+    res.redirect("/customers/login", {
       message: "Password yangilandi",
       error: null,
       token: null,
