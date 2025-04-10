@@ -2,3 +2,13 @@
 {"isException":true,"level":"info","status":400,"timestamp":"2025-04-09 21:43:49"}
 {"isException":true,"level":"info","status":400,"timestamp":"2025-04-09 21:43:57"}
 {"isException":true,"level":"info","status":400,"timestamp":"2025-04-09 21:44:04"}
+{"code":"ERR_HTTP_INVALID_STATUS_CODE","level":"info","timestamp":"2025-04-10 11:41:29"}
+{"code":11000,"errorLabelSet":{},"errorResponse":{"code":11000,"errmsg":"E11000 duplicate key error collection: hotelbooking.customer index: email_1 dup key: { email: \"dilzodbekxursanov0@gmail.com\" }","index":0,"keyPattern":{"email":1},"keyValue":{"email":"dilzodbekxursanov0@gmail.com"}},"index":0,"keyPattern":{"email":1},"keyValue":{"email":"dilzodbekxursanov0@gmail.com"},"level":"info","timestamp":"2025-04-10 12:15:55"}
+{"code":"ERR_HTTP_INVALID_STATUS_CODE","level":"info","timestamp":"2025-04-10 12:18:32"}
+{"level":"info","path":"/home/asus/Documents/Mehmonxona-bron/src/views/forgot-password.ejs","timestamp":"2025-04-10 12:19:00"}
+{"code":"ERR_HTTP_INVALID_STATUS_CODE","level":"info","timestamp":"2025-04-10 12:23:51"}
+{"level":"info","path":"/home/asus/Documents/Mehmonxona-bron/src/views/forgot-password.ejs","timestamp":"2025-04-10 12:24:12"}
+{"level":"info","path":"/home/asus/Documents/Mehmonxona-bron/src/views/login.ejs","timestamp":"2025-04-10 12:29:54"}
+{"level":"info","path":"/home/asus/Documents/Mehmonxona-bron/src/views/forgot-password.ejs","timestamp":"2025-04-10 12:31:09"}
+{"code":"ERR_HTTP_INVALID_STATUS_CODE","level":"info","timestamp":"2025-04-10 12:32:03"}
+{"level":"info","path":"/home/asus/Documents/Mehmonxona-bron/src/views/forgot-password.ejs","timestamp":"2025-04-10 12:35:10"}

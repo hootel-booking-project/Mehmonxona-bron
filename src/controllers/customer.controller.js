@@ -89,61 +89,66 @@ export const forgotPassword = async (req, res, next) => {
       });
     }
 
-    
-    const server_base_url = "http://localhost:3000";
-    const token = crypto.randomBytes(50);
-    user.token = token.toString("hex");
-
+    const token = crypto.randomBytes(50).toString("hex");
+    user.token = token;
     await user.save();
+
+    const resetLink = `http://localhost:3000/customers/reset-password?token=${token}`;
 
     await sendMail({
       to: email,
-      subject: "Reset password",
+      subject: "Reset Password",
       html: `
-        <h2>Quyidagi link orqali parolingizni yangilang</h2>
-        <a href="${server_base_url}/customers/reset-password?token=${user.token}">Link</a>
+        <h2>Salom ${user.name},</h2>
+        <p>Parolingizni yangilash uchun quyidagi havolani bosing:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>Agar bu siz bolmasangiz, bu xabarni e'tiborsiz qoldiring.</p>
       `,
     });
 
-    res.redirect("/customers/reset-password", {
-      message: "Emailingizga link yuborildi!",
-      error: null,
-    });
+    return res.redirect(`/customers/forgot-password?message=Email yuborildi!`);
   } catch (error) {
     next(error);
   }
 };
 
+
 const resetPassword = async (req, res, next) => {
   try {
-    const { password } = req.body
-    const { token } = req.query
+    const { password } = req.body;
+    const { token } = req.query;
 
     if (!token) {
-      return res.render("login");
+      return res.render("login", {
+        error: "Token is missing",
+        message: null,
+      });
     }
 
-    const user = await customerModel.findOne({ token })
-    
+    const user = await customerModel.findOne({ token });
+
     if (!user) {
-      return res.render("forgot-password")
+      return res.render("forgot-password", {
+        error: "Token invalid or expired",
+        message: null,
+      });
     }
 
     const passwordHash = await hashPassword(password);
 
     user.password = passwordHash;
     user.token = null;
-
     await user.save();
-    res.redirect("/customers/login", {
-      message: "Password yangilandi",
+
+    return res.render("login", {
+      message: "Password successfully updated!",
       error: null,
-      token: null,
-    })
+    });
   } catch (error) {
     next(error);
   }
 };
+
 
 const getAllUsers = async (req, res, next) => {
   try {

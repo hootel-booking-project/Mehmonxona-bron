@@ -6,6 +6,7 @@ function dublicateFileError(err){
         err.isException = true
         err.message = `Ushbu "${Object.values(err.keyValue).join(", ")}" qiymatlari allaqachon ishlatilgan`
     }
+    return err
 }
 
 

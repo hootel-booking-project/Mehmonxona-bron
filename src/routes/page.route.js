@@ -25,7 +25,8 @@ pageRouter.get("/customers/reset-password", (req, res) => {
   res.render("reset-password", { error: null, message: null, token });
 });
 
-// POST request - forgot password form uchun
-pageRouter.post("/customers/forgot-password", forgotPassword);  // forgotPassword controllerini chaqiramiz
+// pageRouter.get("/customers/forgot-password", (req, res) => {
+//   res.render("login", { error: null })
+// });
 
 export default pageRouter;
