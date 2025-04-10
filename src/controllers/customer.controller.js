@@ -89,11 +89,7 @@ export const forgotPassword = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-=======
-    const server_base_url = "http://localhost:4000";
->>>>>>> 7a6b38a0bb4f2f4da3c66581a05d00ccb675c8ad
-
+    
     const server_base_url = "http://localhost:3000";
     const token = crypto.randomBytes(50);
     user.token = token.toString("hex");
@@ -120,42 +116,30 @@ export const forgotPassword = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   try {
-    const { password } = req.body;  // Yangi parolni olish
-    const { token } = req.query;    // Tokenni olish
+    const { password } = req.body
+    const { token } = req.query
 
-    // Agar token bo'lmasa, foydalanuvchini login sahifasiga yo'naltirish
     if (!token) {
       return res.render("login");
     }
 
-    // Token bo'yicha foydalanuvchini topish
-    const user = await customerModel.findOne({ token });
-
-    // Agar foydalanuvchi topilmasa, foydalanuvchini forgot-password sahifasiga yo'naltirish
+    const user = await customerModel.findOne({ token })
+    
     if (!user) {
-      return res.render("forgot-password");
+      return res.render("forgot-password")
     }
 
-    // Yangi parolni hash qilish
     const passwordHash = await hashPassword(password);
 
-    // Foydalanuvchining parolini yangilash va tokenni tozalash
     user.password = passwordHash;
-    user.token = null; // Tokenni tozalash
+    user.token = null;
 
-    // Foydalanuvchini saqlash
     await user.save();
-
-<<<<<<< HEAD
-    // Parol yangilanganidan keyin foydalanuvchini login sahifasiga yo'naltirish
-    res.redirect("/customers/login"); // Login sahifasiga yo'naltirish
-=======
     res.redirect("/customers/login", {
       message: "Password yangilandi",
       error: null,
       token: null,
-    });
->>>>>>> 7a6b38a0bb4f2f4da3c66581a05d00ccb675c8ad
+    })
   } catch (error) {
     next(error);
   }
