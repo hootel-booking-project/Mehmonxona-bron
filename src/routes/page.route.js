@@ -1,9 +1,7 @@
 import { Router } from "express";
-import { forgotPassword} from "../controllers/customer.controller.js";  // kerakli controllerni import qiling
 
 const pageRouter = Router();
 
-// GET requestlar
 pageRouter.get("/", (req, res) => {
   res.render("index", { error: null });
 });
