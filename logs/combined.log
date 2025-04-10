@@ -1,4 +1,0 @@
-{"code":11000,"errorLabelSet":{},"errorResponse":{"code":11000,"errmsg":"E11000 duplicate key error collection: booking.customer index: email_1 dup key: { email: \"ahmadillohasanov099@gmail.com\" }","index":0,"keyPattern":{"email":1},"keyValue":{"email":"ahmadillohasanov099@gmail.com"}},"index":0,"keyPattern":{"email":1},"keyValue":{"email":"ahmadillohasanov099@gmail.com"},"level":"info","timestamp":"2025-04-09 21:43:39"}
-{"isException":true,"level":"info","status":400,"timestamp":"2025-04-09 21:43:49"}
-{"isException":true,"level":"info","status":400,"timestamp":"2025-04-09 21:43:57"}
-{"isException":true,"level":"info","status":400,"timestamp":"2025-04-09 21:44:04"}

@@ -14,7 +14,7 @@ const register = async (req, res, next) => {
     const foundedUser = await customerModel.findOne({ email });
 
     if (foundedUser) {
-      res.render("register", {
+      return res.render("register", {
         error: "User already exists, try again!",
       });
     }
@@ -30,7 +30,7 @@ const register = async (req, res, next) => {
     await sendMail({
       to: email,
       subject: "Welcome",
-      text: `Assalomu Alaykum ${name} Bizning MehmonXona saytimizdan muvaffaqiyatli royhatdan otdingiz malades 💥`,
+      text: `Assalomu Alaykum ${name},Siz Bizning Mehmonxona Saytimizdan muvaffaqiyatli royxatdan otdingiz.`,
     });
 
     return res.redirect("/customers/login");
@@ -46,8 +46,7 @@ const login = async (req, res, next) => {
     const user = await customerModel.findOne({ email });
 
     if (!user) {
-      res.render("login", { error: "User not found" });
-      return;
+      return res.render("login", { error: "User not found" });
     }
 
     const isMatch = await comparePassword(password, user.password);
@@ -59,12 +58,12 @@ const login = async (req, res, next) => {
     const tokens = await generateTokens(user._id);
 
     res.cookie("accessToken", tokens.accessToken, {
-      maxAge: 60 * 1000,
+      maxAge: 60 * 10000,
       httpOnly: true,
     });
 
     res.cookie("refreshToken", tokens.refreshToken, {
-      maxAge: 2 * 60 * 1000,
+      maxAge: 10 * 60 * 10000,
       httpOnly: true,
     });
 
@@ -84,18 +83,19 @@ export const forgotPassword = async (req, res, next) => {
 
     if (!user) {
       return res.render("forgot-password", {
-        error: "User not found",
+        error: "User not found",  // error xabarini yuborish
         message: null,
       });
     }
 
-    
     const server_base_url = "http://localhost:3000";
     const token = crypto.randomBytes(50);
+
     user.token = token.toString("hex");
 
     await user.save();
 
+    // Send email with reset link
     await sendMail({
       to: email,
       subject: "Reset password",
@@ -105,10 +105,7 @@ export const forgotPassword = async (req, res, next) => {
       `,
     });
 
-    res.redirect("/customers/reset-password", {
-      message: "Emailingizga link yuborildi!",
-      error: null,
-    });
+    res.redirect("/customers/reset-password");
   } catch (error) {
     next(error);
   }
@@ -116,17 +113,17 @@ export const forgotPassword = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   try {
-    const { password } = req.body
-    const { token } = req.query
+    const { password } = req.body;
+    const { token } = req.query;
 
     if (!token) {
       return res.render("login");
     }
 
-    const user = await customerModel.findOne({ token })
-    
+    const user = await customerModel.findOne({ token });
+
     if (!user) {
-      return res.render("forgot-password")
+      return res.render("forgot-password");
     }
 
     const passwordHash = await hashPassword(password);
@@ -135,11 +132,12 @@ const resetPassword = async (req, res, next) => {
     user.token = null;
 
     await user.save();
-    res.redirect("/customers/login", {
-      message: "Password yangilandi",
+
+    // Redirect to login page with success message
+    res.render("login", {
+      message: "Password yangilandi. Iltimos, qayta kirishga harakat qiling.",
       error: null,
-      token: null,
-    })
+    });
   } catch (error) {
     next(error);
   }
@@ -147,12 +145,7 @@ const resetPassword = async (req, res, next) => {
 
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await userModel.find().populate({
-      path: "bookings",
-      populate: {
-        path: "roomId",
-      },
-    });
+    const users = await customerModel.find();
 
     res.send({
       message: "success",
@@ -173,6 +166,7 @@ const refreshToken = (req, res, next) => {
     jwt.verify(token, jwtConfig.REFRESH_TOKEN, (err, decoded) => {
       if (err)
         return res.status(403).send({ message: "Invalid refresh token" });
+
       const newTokens = generateTokens(decoded.id);
       res.send({ message: "success", tokens: newTokens });
     });
@@ -186,19 +180,22 @@ const verifyToken = (req, res, next) => {
   if (!token) return res.status(401).send({ message: "Unauthorized" });
 
   jwt.verify(token, jwtConfig.ACCESS_TOKEN, (err, decoded) => {
-    if (err) return next(BaseException("Invalid Token", 403));
+    if (err) return res.status(403).send({ message: "Invalid Token" });
 
     req.userId = decoded.id;
+    next();
   });
 };
+
 
 const getProfile = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const user = await customerModel.findById(id).populate("booking");
+    const user = await customerModel.findById(id);
 
-    if (!user) return next(new BaseException("user not found", 404));
+    if (!user) return next(new BaseException("User not found", 404));
+
     res.send({
       message: "success",
       data: user,
@@ -207,6 +204,7 @@ const getProfile = async (req, res, next) => {
     next(error);
   }
 };
+
 
 const updateProfile = async (req, res, next) => {
   try {
@@ -221,11 +219,11 @@ const updateProfile = async (req, res, next) => {
       password: hashedPassword,
     });
 
-    if (!user) return next(BaseException("User Not Found", 400));
+    if (!user) return next(new BaseException("User Not Found", 400));
 
     res.send({ message: "Profile updated successfully", data: user });
   } catch (error) {
-    next(BaseException("Internal Server Error", 500));
+    next(new BaseException("Internal Server Error", 500));
   }
 };
 
