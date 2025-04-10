@@ -21,12 +21,12 @@ const logger = winston.createLogger({
       filename: "logs/%DATE%-info.log",
       datePattern: "YYYY-MM-DD",
       level: "info",
-      maxFiles: "7d",
+      maxFiles: "1d",
     }),
     new DailyRotateFile({
       filename: "logs/%DATE%-combined.log",
       datePattern: "YYYY-MM-DD",
-      maxFiles: "7d",
+      maxFiles: "1d",
     }),
   ],
 });

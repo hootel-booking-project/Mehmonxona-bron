@@ -25,7 +25,7 @@ customerRouter
 
 .post(
   "/reset-password",
-  Protected(false),
+  Protected(true),
   Roles(ROLES.ALL),
   customerController.resetPassword
 )
