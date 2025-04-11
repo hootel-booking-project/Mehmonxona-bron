@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login Form</title>
+  <link rel="icon" href="favicon-32x32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="favicon-48x48.png" sizes="48x48" type="image/png">
   <style>
   
     * {
@@ -103,23 +105,23 @@
     .container:hover i {
       border: 6px solid var(--clr);
       color: rgb(0, 0, 255);
-      filter: drop-shadow(0 0 20px var(--clr));
+      filter: drop-shadow(0 0 5px var(--clr));
       
     }
 
     .container i:nth-child(1) {
       border-radius: 66% 34% 67% 33% / 27% 65% 35% 73%;
-      animation: animate 14s linear infinite;
+      animation: animate 15s linear infinite;
     }
 
     .container i:nth-child(2) {
       border-radius: 53% 47% 53% 47% / 50% 40% 60% 50%;
-      animation: animate 13s linear infinite;
+      animation: animate 20s linear infinite;
     }
 
     .container i:nth-child(3) {
       border-radius: 41% 59% 43% 57% / 57% 30% 70% 43%;
-      animation: animate 15s linear infinite;
+      animation: animate 25s linear infinite;
     }
 
     @keyframes animate {
@@ -134,7 +136,7 @@
 
 
     .container:hover i:nth-child(3) {
-      animation: animate 1s linear infinite;
+      animation: animate 10s linear infinite;
     }
 
 
@@ -143,7 +145,9 @@
 <body>
   <form action="/customers/login" method="post">
     <div class="container">
+      <i style="--clr: #000"></i>
       <i style="--clr: #FF2929"></i>
+      <i style="--clr: #000"></i>
 
       <div class="login" style="align-items: center;">
         <h2>Login</h2>
