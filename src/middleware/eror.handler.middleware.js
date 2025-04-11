@@ -23,6 +23,8 @@ function mongoServerErrorHandler(err) {
 }
 
 export const ErrorHandlerMiddleware = (err, _, res, __) => {
+    console.log("error=>", err);
+    
     if (err instanceof Error) {
         logger.error(err.message);
     } else {

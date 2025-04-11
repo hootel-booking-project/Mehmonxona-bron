@@ -15,7 +15,7 @@ const register = async (req, res, next) => {
 
     if (foundedUser) {
       return res.render("register", {
-        error: "User already exists, try again!",
+        error: "User already exists",
       });
     }
 
@@ -30,7 +30,7 @@ const register = async (req, res, next) => {
     await sendMail({
       to: email,
       subject: "Welcome",
-      text: `Assalomu Alaykum ${name},Siz Bizning Mehmonxona Saytimizdan muvaffaqiyatli royxatdan otdingiz.`,
+      text: `Assalomu Alaykum ${name}, Siz Bizning Mehmonxona Saytimizdan muvaffaqiyatli royxatdan otdingiz.`,
     });
 
     return res.redirect("/customers/login");
@@ -45,8 +45,10 @@ const login = async (req, res, next) => {
 
     const user = await customerModel.findOne({ email });
 
-    if (!user) {
-      return res.render("login", { error: "User not found" });
+    if (!user){
+      return res.render("login", {
+        error: "User not found",
+      });
     }
 
     const isMatch = await comparePassword(password, user.password);
@@ -80,18 +82,20 @@ export const forgotPassword = async (req, res, next) => {
     const { email } = req.body;
 
     const user = await customerModel.findOne({ email });
+    console.log("foundUser", user);
 
     if (!user) {
       return res.render("forgot-password", {
-        error: "User not found",  
+        error: "User not found",
         message: "null",
       });
     }
 
-    
     const server_base_url = "http://localhost:3000";
-    const token = crypto.randomBytes(50);
-    user.token = token.toString("hex");
+    const token = crypto.randomBytes(50).toString("hex");
+    console.log("token=>", token);
+
+    user.token = token;
 
     await user.save();
 
@@ -111,13 +115,12 @@ export const forgotPassword = async (req, res, next) => {
 
     res.render("forgot-password", {
       message: "Emailga link yuborildi, tekshiring!",
-      error: null
+      error: null,
     });
   } catch (error) {
     next(error);
   }
 };
-
 
 const resetPassword = async (req, res, next) => {
   try {
@@ -134,23 +137,24 @@ const resetPassword = async (req, res, next) => {
     const user = await customerModel.findOne({ token });
 
     if (!user) {
-      return res.render("forgot-password")
+      return res.render("forgot-password", {
+        error: "User topilmadi",
+        message: null,
+      });
     }
 
     const passwordHash = await hashPassword(password);
 
     user.password = passwordHash;
-    user.token = null;
     await user.save();
-    res.redirect("/customers/login", {
-      message: "Password yangilandi",
-      error: null,
+    res.render("login", {
+      message: "Parolingiz yangilandi",
+      error: null
     });
   } catch (error) {
     next(error);
   }
 };
-
 
 const getAllUsers = async (req, res, next) => {
   try {
@@ -196,7 +200,6 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-
 const getProfile = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -213,7 +216,6 @@ const getProfile = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const updateProfile = async (req, res, next) => {
   try {

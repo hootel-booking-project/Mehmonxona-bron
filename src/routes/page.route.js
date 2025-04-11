@@ -7,7 +7,7 @@ pageRouter.get("/", (req, res) => {
 });
 
 pageRouter.get("/customers/login", (req, res) => {
-  res.render("login", { error: null });
+  res.render("login", { error: null, message: null });
 });
 
 pageRouter.get("/customers/register", (req, res) => {

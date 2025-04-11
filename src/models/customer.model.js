@@ -20,6 +20,7 @@ const customerSchema = new mongoose.Schema({
         enum: [ROLES.VIEWER, ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN],
         default: ROLES.VIEWER
     },
+    token: String,
     booking: [{
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Booking"

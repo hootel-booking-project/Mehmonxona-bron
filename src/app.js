@@ -24,6 +24,9 @@ app.set("views", path.join(process.cwd(), "src", "views"));
 app.use(cookieParser());
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use(express.static(path.join(process.cwd(), 'public')));
+console.log(path.join(process.cwd(), 'public'))
+
 
 app.use("/", pageRouter);
 app.use("/", router);
