@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ROLES } from "../constants/role.constants.js";
 
 const customerSchema = new mongoose.Schema({
     name: {
@@ -16,9 +17,14 @@ const customerSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["user", "admin"],
-        default: "user"
-    }
+        enum: [ROLES.VIEWER, ROLES.HOTEL_OWNER, ROLES.SUPER_ADMIN],
+        default: ROLES.VIEWER
+    },
+    token: String,
+    booking: [{
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Booking"
+    }]
 },
 {
     timestamps: true,
@@ -26,4 +32,4 @@ const customerSchema = new mongoose.Schema({
     versionKey: false
 }
 )
-export default mongoose.model("Customer", customerSchema)
+export default mongoose.model("Customers", customerSchema)
