@@ -17,7 +17,7 @@ function castErrorHandler(err) {
 
 function mongoServerErrorHandler(err) {
     if (err.name === 'MongoServerError') {
-        return new BaseException(`MongoDB server xatosi: ${err.message}`,500)
+        return new BaseException(`MongoDb server xatosi: ${err.message}`,500)
     }
     return err;
 }
