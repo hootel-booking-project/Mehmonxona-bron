@@ -20,17 +20,9 @@ jobs:
 
     - name: Pull latest code & restart app on server
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} /bin/bash << 'EOF'
-          set -e  # Xatolarda to'xtash uchun
-          cd ${{ secrets.DEPLOY_PATH }} || { echo "Directory not found"; exit 1; }
-          git fetch origin
-          git reset --hard origin/main
-          npm install --production
-          if pm2 restart server; then
-            echo "Server restarted"
-          else
-            pm2 start main.js --name server
-            pm2 save
-            pm2 startup
-          fi
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          cd ${{ secrets.DEPLOY_PATH }}
+          git pull origin main
+          npm i
+          pm2 restart server || pm2 start main.js --name server
         EOF
