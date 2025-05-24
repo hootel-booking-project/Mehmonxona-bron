@@ -16,16 +16,20 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy to server
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          set -e
-          cd ${{ secrets.DEPLOY_PATH }}
-          echo "1. Git pull..."
-          git pull origin main
-          echo "2. NPM install..."
-          npm ci --production
-          echo "3. PM2 restart..."
-          pm2 restart server || pm2 start src/server.js --name server
-          echo "Deploy muvaffaqiyatli yakunlandi"
-        EOF
+- name: Deploy to server
+  run: |
+    ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+      if [ $? -ne 0 ]; then
+        echo "Failed to connect to server. Please verify SSH credentials."
+        exit 1
+      fi
+      set -e
+      cd ${{ secrets.DEPLOY_PATH }}
+      echo "1. Git pull..."
+      git pull origin main
+      echo "2. NPM install..."
+      npm ci --production
+      echo "3. PM2 restart..."
+      pm2 restart server || pm2 start src/server.js --name server
+      echo "Deploy muvaffaqiyatli yakunlandi"
+    EOF
