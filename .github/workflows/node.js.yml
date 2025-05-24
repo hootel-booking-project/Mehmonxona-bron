@@ -22,7 +22,9 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           cd ${{ secrets.DEPLOY_PATH }}
+          console.log("sallom")
           git pull origin main
           npm i
+          console.log("sallom")
           pm2 restart server || pm2 start src/server.js --name server
         EOF
