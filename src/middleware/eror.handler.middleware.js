@@ -10,7 +10,7 @@ function dublicateFileError(err) {
 
 function castErrorHandler(err) {
     if (err.name === 'CastError') {
-        return new BaseException(`Notogri tipdagi qiymat: ${err.value}`,400)
+        return new BaseException(`Noto'gri tipdagi qiymat: ${err.value}`,400)
     }
     return err;
 }
