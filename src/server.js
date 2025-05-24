@@ -4,7 +4,7 @@ import connectToMongoDb from "./config/db.config.js";
 
 await connectToMongoDb();
 
-let server = app.listen(PORT, () => console.log(`Server is running on port: ${PORT}✅`
+let server = app.listen(PORT, () => console.log(`Server is running at: ${PORT}✅`
 
 ));
 
