@@ -3,7 +3,7 @@ import logger from '../config/winston.config.js';
 
 function dublicateFileError(err) {
     if (err?.code === 11000) {
-        return new BaseException(`Ushbu "${Object.values(err.keyValue).join(", ")}" qiymatlari allaqachon ishlatilgan`,409)
+        return new BaseException(`Ushbu "${Object.values(err.keyValue).join(", ")}" qiymatlari allaqachon mavjud`,409)
     }
     return err;
 }

@@ -1,7 +1,7 @@
 import { BaseException } from "../exception/base.exception.js";
 
 export const ValidationMiddleware = (schema) => {
-  return (req, __, next) => {
+  return (req, res, next) => {
     try {
       
      const { error, value } = schema.validate(req.body);
